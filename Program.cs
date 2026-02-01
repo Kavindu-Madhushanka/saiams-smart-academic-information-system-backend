@@ -23,12 +23,12 @@ builder.Services.AddCors(options => {
 });
 
 var app = builder.Build();
+app.UseCors("AllowReactApp");
+
 
 // Middleware Pipeline එක සැකසීම
-app.UseHttpsRedirection();
 
-// Cors පාවිච්චි කිරීම (Authorization වලට කලින් මෙය තිබිය යුතුයි)
-app.UseCors("AllowReactApp");
+// Cors පාවිච්චි කිරීම (Authorization වලට කලින් මෙය තිබිය යු
 
 app.UseAuthorization();
 
