@@ -1,7 +1,9 @@
-﻿namespace backend.Models
+﻿using System.ComponentModel.DataAnnotations;
+namespace backend.Models
 {
     public class Student
     {
+        [Key]
         public int st_id { get; set; }
         public int st_user_id {  get; set; }
         public string st_registation_no { get; set;}=string.Empty;
