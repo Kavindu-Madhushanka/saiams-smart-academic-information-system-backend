@@ -11,6 +11,8 @@ namespace backend.Data
     }
     public DbSet<User> Users { get; set; }
         public DbSet<Student> student {  get; set; }
+        public DbSet<Lectures>lectures { get; set; }
+        public DbSet<Subjects> subjects { get; set; }
 
 
 
