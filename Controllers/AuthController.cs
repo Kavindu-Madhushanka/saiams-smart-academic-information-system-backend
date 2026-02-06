@@ -4,6 +4,8 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace backend.Controllers
@@ -82,6 +84,68 @@ namespace backend.Controllers
         public async Task<IActionResult> GetStudent() {
             var students = await _context.student.ToListAsync();
             return Ok(students);
+        }
+
+        [HttpPost("addlectures")]
+        public async Task<IActionResult> AddLectureToSystem([FromBody] AddLecture addLecture)
+        {
+            if (addLecture == null) return BadRequest("Data is null");
+
+            var logindata = new User() {
+                Username = addLecture.staffId,
+                PasswordHash = addLecture.password,
+                Role = addLecture.role,
+
+            };
+            _context.Users.Add(logindata);
+            await _context.SaveChangesAsync();
+
+            var lecturedata = new Lectures() {
+                full_name=addLecture.fullName,
+                staff_id=addLecture.staffId,
+                email=addLecture.email,
+                phone_number=addLecture.phoneNumber,
+                faculty=addLecture.faculty,
+                department=addLecture.department,
+                academic_role=addLecture.academicRole,
+                user_id = logindata.Id,
+            };
+            _context.lectures.Add(lecturedata);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Registation successful!" });
+
+
+           
+            
+
+            
+        }
+        [HttpGet("getlecture")]
+        public async Task<IActionResult> Getlecture() { 
+            var lecture_data= await _context.lectures.ToListAsync();
+            return Ok(lecture_data);
+        }
+
+        [HttpPost("addsubject")]
+        public async Task<IActionResult> AddSubjectToSystem([FromBody] AddSubjects addSubjects)
+        {
+            if (addSubjects == null) return BadRequest("data is null");
+
+            var subjectdata = new Subjects()
+            {
+                Subject_Code = addSubjects.subjectCode,
+                Subject_Name = addSubjects.subjectName,
+                Credit=addSubjects.credit,
+                Academic_Level=addSubjects.academicLevel,
+                Semester=addSubjects.semester,
+                Type=addSubjects.type,
+
+
+            };
+            _context.subjects.Add(subjectdata);
+            await _context.SaveChangesAsync();
+            
+            return Ok(new { message = "Successful add subjects!" });
         }
     }
 }
