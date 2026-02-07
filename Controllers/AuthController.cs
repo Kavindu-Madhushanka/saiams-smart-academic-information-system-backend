@@ -147,5 +147,10 @@ namespace backend.Controllers
             
             return Ok(new { message = "Successful add subjects!" });
         }
+        [HttpGet("getSubjectIDandName")]
+        public async Task<IActionResult> GetSubDetails() {
+            var subjectDetails=await _context.subjects.ToListAsync();
+            return Ok(subjectDetails);
+        }
     }
 }
