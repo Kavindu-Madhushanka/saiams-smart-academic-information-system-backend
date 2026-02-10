@@ -5,6 +5,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -147,10 +148,73 @@ namespace backend.Controllers
             
             return Ok(new { message = "Successful add subjects!" });
         }
-        [HttpGet("getSubjectIDandName")]
+        [HttpGet("getSubjectDetails")]
         public async Task<IActionResult> GetSubDetails() {
             var subjectDetails=await _context.subjects.ToListAsync();
             return Ok(subjectDetails);
+        }
+
+        [HttpGet("getAvailableYears")]
+        public async Task<IActionResult> Getyears()
+            
+        {
+            
+            var years = await _context
+                .Database.
+                SqlQuery<string>($"SELECT DISTINCT academic_year FROM student")
+                .ToListAsync();
+            return Ok(years);
+        }
+
+        [HttpGet("getStudentsByYear")]
+        public async Task<IActionResult> GetStudentsByYear(string year)
+        {
+            try
+            {
+                
+                var studentList = await _context.student
+                    .Where(s => s.academic_year == year)
+                    .Select(s => new {
+                        s.st_registation_no,
+                    })
+                    .ToListAsync();
+
+                if (studentList == null || studentList.Count == 0)
+                {
+                    return NotFound(new { message = "not select student for this year" });
+                }
+
+                return Ok(studentList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "can,t get data!", error = ex.Message });
+            }
+        }
+        [HttpGet("getLecturersDetails")]
+        public async Task<IActionResult> GetlectureDetails()
+
+
+        {
+            var lectureDetails = await _context.lectures.ToListAsync();
+            return Ok(lectureDetails);
+        }
+
+        [HttpPost ("putLectureSubject")]
+        public async Task<IActionResult> PostLectureSubject([FromBody] AddLectureSubject lecturesubject)
+        {
+            if (lecturesubject == null) return BadRequest("data is empty");
+            var tabledata = new LectureSubject()
+
+            {
+                subject_id=lecturesubject.subject_id,
+                lecture_id=lecturesubject.lecture_id,
+                subject_type=lecturesubject.subject_type,
+
+            };
+            _context.lecturesubject.Add(tabledata);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Successful add subjects&Lectures" });
         }
     }
 }
